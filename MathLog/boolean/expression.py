@@ -497,12 +497,13 @@ class Expression:
                 else:
                     table[i].append(1)
 
-        core = []
-        new_table = []
+        core, new_table, removed_implicants = [], [], []
         for row in table:
             if row.count(1) == 1:
-                impl = implicants.pop(row.index(1))
-                core.append(impl)
+                impl = implicants[row.index(1)]
+                if impl not in removed_implicants:
+                    core.append(impl)
+                    removed_implicants.append(impl)
                 for other_row in table:
                     if other_row[row.index(1)] == 1:
                         if other_row in new_table:
@@ -510,6 +511,7 @@ class Expression:
             elif row not in new_table:
                 new_table.append(row)
         table = new_table
+        implicants = [i for i in implicants if i not in removed_implicants]
 
         if not table:
             return mask_to_expr(core)
@@ -526,7 +528,7 @@ class Expression:
                             covered.append(j)
             if len(covered) == len(table):
                 combinations.update({len(txnf): txnf})
-        return mask_to_expr(core + combinations[sorted(combinations)[0]])
+        return mask_to_expr(core + (combinations[sorted(combinations)[0]] if combinations else []))
 
     @property
     def dnf(self):
