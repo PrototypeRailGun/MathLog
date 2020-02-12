@@ -449,7 +449,7 @@ class Expression:
         # Splicing in the groups
         for group in by_position:
             completed = False
-            while not completed:
+            while not completed and group:
                 for first in group:
                     for second in group:
                         pos = count = 0
@@ -457,7 +457,7 @@ class Expression:
                             if first[p] != second[p]:
                                 pos = p
                                 count += 1
-                            if count > 1:
+                            if count != 1:
                                 completed = True
                                 break
                         else:
